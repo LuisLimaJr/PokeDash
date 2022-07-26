@@ -18,7 +18,7 @@ library(tidyverse)
 library(shiny)
 library(DT)
 
-pokedex <- as.tibble(read.csv("~/R Projects/PokeDash/pokedex.csv"))
+pokedex <- as.tibble(read.csv("pokedex.csv"))
 
 
 
