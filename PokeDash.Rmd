@@ -1,0 +1,153 @@
+---
+title: "PokeDashboard"
+output: 
+  flexdashboard::flex_dashboard:
+    orientation: columns
+    vertical_layout: scroll
+runtime: shiny
+
+#Base de dados retirada de https://www.kaggle.com/datasets/mariotormo/complete-pokemon-dataset-updated-090420?select=pokedex_%28Update_05.20%29.csv
+---
+
+
+
+```{r setup, include=FALSE}
+library(flexdashboard)
+library(ggplot2)
+library(tidyverse)
+library(shiny)
+library(DT)
+
+pokedex <- as.tibble(read.csv("~/R Projects/PokeDash/pokedex.csv"))
+
+
+
+
+
+```
+
+# Pokedex
+
+Column {data-width = 1000}
+-----------------------------------------------------------------------
+
+
+### Pokedex
+
+```{r}
+
+renderDataTable({
+  pokedex %>%
+  select(pokedex_number, name, generation, status, species, type_number, type_1, type_2, height_m, weight_kg, abilities_number, ability_1, ability_2, ability_hidden, total_points, hp, attack, defense, sp_attack, sp_defense, speed, catch_rate, base_friendship, growth_rate, egg_type_number, egg_type_1, egg_type_2, percentage_male, egg_cycles)
+
+}) 
+
+
+
+
+```
+
+
+# PokeGraficos
+
+Column {.sidebar}
+------------------------------------------
+
+```{r}
+selectInput(
+  inputId = "varYB",
+  label = "Escolha a variavel Y - Boxplot ",
+  choices = c("generation", "height_m", "weight_kg", "abilities_number", "total_points", "hp", "attack", "defense", "sp_attack", "sp_defense", "speed", "catch_rate", "base_friendship", "egg_type_number", "egg_type_1", "egg_type_2", "percentage_male", "egg_cycles"),
+  selected = "speed"
+)
+
+selectInput(
+  inputId = "varXB",
+  label = "Escolha a variavel X - Boxplot",
+  choices = c("generation", "height_m", "weight_kg", "abilities_number", "total_points", "hp", "attack", "defense", "sp_attack", "sp_defense", "speed", "catch_rate", "base_friendship", "egg_type_number", "egg_type_1", "egg_type_2", "percentage_male", "egg_cycles"),
+  selected = "total_points"
+)
+
+selectInput(
+  inputId = "varXH",
+  label = "Escolha a variavel X - Histograma",
+  choices = c("generation",  "height_m", "weight_kg", "abilities_number", "total_points", "hp", "attack", "defense", "sp_attack", "sp_defense", "speed", "catch_rate", "base_friendship", "egg_type_number", "egg_type_1", "egg_type_2", "percentage_male", "egg_cycles"),
+  selected = "total_points"
+)
+
+
+
+
+
+```
+
+
+Column {data-width=250}
+-----------------------------------------------------------------------
+
+### Boxplot
+
+```{r}
+renderPlot({
+  
+  pokedex %>% 
+  ggplot() +
+  aes(y = !!sym(input$varYB), fill = !!sym(input$varXB)) +
+  geom_boxplot(color="darkblue", fill="lightblue") +
+  theme(legend.position = "top")
+
+  
+})
+
+
+```
+
+Column {data-width=250}
+-----------------------------------------------------------------------
+
+### Histograma
+
+```{r}
+renderPlot({
+  pokedex %>% 
+  ggplot()+
+  aes(x = !!sym(input$varXH))+
+  geom_histogram(color="darkblue", fill="lightblue") +
+  theme(legend.position = "top")
+})
+
+
+```
+Column {data-width=250}
+-----------------------------------------------------------------------
+
+### Gráfico de Dispersão
+
+```{r}
+renderPlot({
+  ggplot(pokedex, aes(x=!!sym(input$varXB), y=!!sym(input$varYB))) +
+  geom_point(size=2, shape=23, color="darkblue", fill="lightblue")})
+
+```
+
+
+
+# Resistências e Fraquezas
+
+Column {data-width=500}
+-------------------------------------------------------------------------
+
+### Resistencias e Fraquezas
+
+```{r}
+renderDataTable({
+  pokedex %>%
+  select(pokedex_number, name, type_1, type_2, against_normal, against_fire, against_water, against_bug, against_electric, against_grass, against_ice, against_fight, against_poison, against_ground, against_flying, against_psychic, against_bug, against_rock, against_dragon, against_dark, against_steel, against_fairy) 
+})
+ 
+
+
+```
+
+
+
